@@ -1,0 +1,137 @@
+Driver
+
+
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+
+public class Climate_Driver extends Configured {
+
+	public static void main(String[] args)throws Exception 
+	{
+		if(args.length!=2)
+		{
+			System.out.println("Please give i/p and o/p directory properlly");
+			System.exit(-1);
+		}
+		 
+		Job j=new Job();
+		j.setJarByClass(Climate_Driver.class);
+
+		FileInputFormat.setInputPaths(j,new Path(args[0]));
+		FileOutputFormat.setOutputPath(j,new Path(args[1]));
+		
+		j.setMapperClass(Climate_Mapper.class);
+		j.setReducerClass(ClimateReducer.class);
+		
+		j.setMapOutputKeyClass(Text.class);
+		j.setMapOutputValueClass(FloatWritable.class);
+		
+		j.setOutputKeyClass(Text.class);
+
+		j.setOutputValueClass(FloatWritable.class);
+		
+		System.exit(j.waitForCompletion(true)?0:-1);
+		
+
+	}
+
+
+
+}
+
+
+Mapper
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+
+public class Climate_Mapper extends Mapper<LongWritable,Text,Text,FloatWritable>
+{
+public void map(LongWritable key,Text val,Context c)throws IOException,InterruptedException
+	{
+	/*	String s=val.toString();
+		String s1[]=s.split(",");
+		String state=s1[0];
+		String jan=s1[3];
+		float a=Float.parseFloat(jan);
+		c.write(new Text(state),new FloatWritable(a));*/
+	
+	String s=val.toString();
+		String s1[]=s.split(",");
+		String dist=s1[1];
+		String jan=s1[3];
+		 float a=Float.parseFloat(jan);
+		c.write(new Text(dist),new FloatWritable(a));
+	/*	String s=val.toString();
+		String s1[]=s.split(",");
+		String year=s1[2];
+		String jan=s1[3];
+		 float a=Float.parseFloat(jan);
+		c.write(new Text(year),new FloatWritable(a));*/
+		
+	}
+}
+
+Reducer
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
+
+
+
+public class ClimateReducer extends Reducer<Text,FloatWritable,Text,Text> {
+	
+	public void reduce(Text k,Iterable<FloatWritable>val,Context c)throws IOException,InterruptedException
+	{
+		float max=0;
+		float count=0;
+		float min=0;
+		float tot=0;
+		for(FloatWritable v:val)
+		{
+			float va=v.get();
+			count++;
+			
+			if (count==1) max =v.get();
+			{
+			max=Math.max(max, v.get());
+			}
+			
+			if(count==1)min=v.get();
+			{
+				min=Math.min(min, v.get());
+			}
+			tot+=va;
+		}	
+		
+		//String res=max+"\t"+min;
+		//c.write(k, new Text(res));
+		float avg=tot/count;
+		
+		String res1= min+"\t"+max+"\t"+avg;
+		c.write(k,new Text(res1));
+	
+		
+	}
+
+
+}
+

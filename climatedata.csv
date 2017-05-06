@@ -1,0 +1,13 @@
+Month,Maximum ,Average,Minimum,Average  Precipitation,Number of Wet Days,Average Sunlight,Average Daylight
+Jan,29,25,20,27,3,9,11
+Feb,31,26,22,34,1,10,12
+Mar,33,28,24,4,1,10,12
+Apr,36,31,26,12,2,9,12
+May,37,33,28,39,3,9,12
+Jun,35,32,27,71,9,6,13
+Jul,35,31,26,121,14,5,13
+Aug,34,30,26,138,15,6,12
+Sep,32,30,25,161,11,7,12
+Oct,30,28,24,373,14,8,12
+Nov,28,26,23,409,11,8,12
+Dec,31,25,22,152,7,7,12
